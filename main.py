@@ -8,7 +8,7 @@ from urllib.request import Request, urlopen
 
 from config.builder import Builder
 from config.config import config
-from config.currency-config import currency-config
+from config.currency_config import currencyConfig
 from logs import logger
 from presentation.observer import Observable
 
@@ -56,7 +56,7 @@ def main():
     data_sink = Observable()
     builder = Builder(config)
     builder.bind(data_sink)
-    currencyList = currency-config.currencyList
+    currencyList = currencyConfig.currencyList
     print(currencyList)
 
     try:
