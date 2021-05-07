@@ -13,9 +13,9 @@ class Observable:
     def register(self, observer):
         self._observers.append(observer)
 
-    def update_observers(self, data):
+    def update_observers(self, data, currency):
         for observer in self._observers:
-            observer.update(data)
+            observer.update(data, currency)
 
     def close(self):
         for observer in self._observers:

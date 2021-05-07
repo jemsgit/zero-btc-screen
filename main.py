@@ -1,31 +1,48 @@
 import json
 import random
 import time
+import threading
 from datetime import datetime, timezone, timedelta
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from config.builder import Builder
 from config.config import config
+from config.currency-config import currency-config
 from logs import logger
 from presentation.observer import Observable
 
 DATA_SLICE_DAYS = 1
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
-API_URL = 'https://production.api.coindesk.com/v2/price/values/BTC?ohlc=true'
 
+API_URL = 'https://production.api.coindesk.com/v2/price/values/%s?ohlc=true'
+
+currencyList = ['BTC']
+
+CURRENT_CURRENCY_INDEX = 0
 
 def get_dummy_data():
     logger.info('Generating dummy data')
 
+def toggle_timer():
+    timer = threading.Timer(1000, switch_currency)
+    timer.start()   
+
+def switch_currency():
+    CURRENT_CURRENCY +=1
+    if(CURRENT_CURRENCY >= len(currencyList)):
+        CURRENT_CURRENCY = 0
+
 
 
 def fetch_prices():
+    CURRENT_CURRENCY = currencyList[CURRENT_CURRENCY_INDEX]
+    CURRENCY_API_URL=API_URL % CURRENT_CURRENCY
     logger.info('Fetching prices')
     timeslot_end = datetime.now(timezone.utc)
     end_date = timeslot_end.strftime(DATETIME_FORMAT)
     start_data = (timeslot_end - timedelta(days=DATA_SLICE_DAYS)).strftime(DATETIME_FORMAT)
-    url = f'{API_URL}&start_date={start_data}&end_date={end_date}'
+    url = f'{CURRENCY_API_URL}&start_date={start_data}&end_date={end_date}'
     req = Request(url)
     data = urlopen(req).read()
     external_data = json.loads(data)
@@ -39,6 +56,8 @@ def main():
     data_sink = Observable()
     builder = Builder(config)
     builder.bind(data_sink)
+    currencyList = currency-config.currencyList
+    print(currencyList)
 
     try:
         while True:
