@@ -9,35 +9,40 @@ from urllib.request import Request, urlopen
 from config.builder import Builder
 from config.config import config
 from config.currency_config import currencyConfig
+#from alarm import alarm
 from logs import logger
 from presentation.observer import Observable
+
+import RPi.GPIO as GPIO
+
+BUTTON_CHANNEL = 4
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(BUTTON_CHANNEL, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 DATA_SLICE_DAYS = 1
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
 
 API_URL = 'https://production.api.coindesk.com/v2/price/values/%s?ohlc=true'
 
-currencyList = ['BTC']
-
-CURRENT_CURRENCY_INDEX = 0
+currencyList = currencyConfig.currencyList or ['BTC']
+currency_index = 0
 
 def get_dummy_data():
-    logger.info('Generating dummy data')
+    logger.info('Generating dummy data') 
 
-def toggle_timer():
-    timer = threading.Timer(1000, switch_currency)
-    timer.start()   
+def switch_currency(event):
+    global currency_index
+    currency_index +=1
+    if(currency_index >= len(currencyList)):
+        currency_index = 0
 
-def switch_currency():
-    CURRENT_CURRENCY +=1
-    if(CURRENT_CURRENCY >= len(currencyList)):
-        CURRENT_CURRENCY = 0
-
-
+def get_currency():
+    return currencyList[currency_index]
 
 def fetch_prices():
-    CURRENT_CURRENCY = currencyList[CURRENT_CURRENCY_INDEX]
-    CURRENCY_API_URL=API_URL % CURRENT_CURRENCY
+    currency = get_currency()
+    CURRENCY_API_URL = API_URL % currency
     logger.info('Fetching prices')
     timeslot_end = datetime.now(timezone.utc)
     end_date = timeslot_end.strftime(DATETIME_FORMAT)
@@ -56,15 +61,21 @@ def main():
     data_sink = Observable()
     builder = Builder(config)
     builder.bind(data_sink)
-    currencyList = currencyConfig.currencyList
-    print(currencyList)
+    currency = get_currency()
+
+    GPIO.add_event_detect(BUTTON_CHANNEL, GPIO.RISING, callback=switch_currency, bouncetime=400)
 
     try:
         while True:
             try:
                 prices = [entry[1:] for entry in get_dummy_data()] if config.dummy_data else fetch_prices()
-                data_sink.update_observers(prices)
-                time.sleep(config.refresh_interval)
+                data_sink.update_observers(prices, currency)
+                time_left = config.refresh_interval
+                new_currency = currency
+                while time_left > 0 and currency == get_currency():
+                    time.sleep(1)
+                    time_left -= 1
+                currency = get_currency()
             except (HTTPError, URLError) as e:
                 logger.error(str(e))
                 time.sleep(5)

@@ -10,7 +10,7 @@ class CurrencyConfig:
 
     @property
     def currencyList(self):
-        return self._conf.get('Base', 'curencyList')
+        return self._conf.get('base', 'currencyList').split(',')
 
     def reloadConfig(self, file_name=os.path.join(os.path.dirname(__file__), os.pardir, 'currency-config.cfg')):
         self._conf = self._load_currencies(file_name)
