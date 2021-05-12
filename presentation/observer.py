@@ -2,7 +2,7 @@ class Observer:
     def __init__(self, observable):
         observable.register(self)
 
-    def update(self, data):
+    def update(self, data, currency):
         pass
 
 

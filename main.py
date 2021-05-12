@@ -9,9 +9,10 @@ from urllib.request import Request, urlopen
 from config.builder import Builder
 from config.config import config
 from config.currency_config import currencyConfig
-#from alarm import alarm
 from logs import logger
 from presentation.observer import Observable
+
+import alarm.alarm_manager.alarmManager as alarmManager
 
 import RPi.GPIO as GPIO
 
@@ -40,8 +41,7 @@ def switch_currency(event):
 def get_currency():
     return currencyList[currency_index]
 
-def fetch_prices():
-    currency = get_currency()
+def fetch_currency_data(currency):
     CURRENCY_API_URL = API_URL % currency
     logger.info('Fetching prices')
     timeslot_end = datetime.now(timezone.utc)
@@ -53,6 +53,13 @@ def fetch_prices():
     external_data = json.loads(data)
     prices = [entry[1:] for entry in external_data['data']['entries']]
     return prices
+
+def fetch_prices():
+    currency = get_currency()
+    return fetch_currency_data(currency)
+
+def alarm_callback():
+    print("alarm")
 
 
 def main():
@@ -72,6 +79,7 @@ def main():
                 data_sink.update_observers(prices, currency)
                 time_left = config.refresh_interval
                 new_currency = currency
+                alarmManager.checkAlarms(currency, prices, alarm_callback)
                 while time_left > 0 and currency == get_currency():
                     time.sleep(1)
                     time_left -= 1
