@@ -12,7 +12,7 @@ def getCurrencyList():
     req = Request('https://api.github.com/events')
     data = urlopen(req).read()
     external_data = json.loads(data)
-    currencyConfig.updateCurrencyList(['USD,ETH,BTC'])
+    currencyConfig.updateCurrencyList(['BTC,ETH'])
   except (HTTPError, URLError) as e:
     print('Error')
 

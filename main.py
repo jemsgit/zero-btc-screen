@@ -93,6 +93,8 @@ def main():
                     time.sleep(1)
                     time_left -= 1
                 print('UPDATE')
+                if(currency != get_currency()):
+                  data_sink.update_observers(None, get_currency())
                 currency = get_currency()
             except (HTTPError, URLError) as e:
                 logger.error(str(e))

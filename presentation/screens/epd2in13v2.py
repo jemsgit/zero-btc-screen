@@ -23,6 +23,12 @@ class Epd2in13v2(Observer):
         self.screen_draw = ImageDraw.Draw(self.screen_image)
         self.mode = mode
 
+    def draw_loading(self, currency):
+        img = Image.new('1', (SCREEN_WIDTH, SCREEN_HEIGHT), 255)
+        d = ImageDraw.Draw(img)
+        d.text((30,50), "Loadin %s..." % currency, outline=(50), font=FONT_LARGE)
+        self.epd.displayPartial(self.epd.getbuffer(img.rotate(180)))
+
     @staticmethod
     def _init_display(epd):
         epd.init(epd.FULL_UPDATE)
@@ -49,11 +55,14 @@ class Epd2in13v2(Observer):
         Plot.caption(flatten_prices[len(flatten_prices) - 1], 95, SCREEN_WIDTH, FONT_LARGE, screen_draw, currency)
 
     def update(self, data, currency):
-        self.form_image(data, self.screen_draw, currency)
-        screen_image_rotated = self.screen_image.rotate(180)
-        # TODO: add a way to switch bewen partial and full update
-        # epd.presentation(epd.getbuffer(screen_image_rotated))
-        self.epd.displayPartial(self.epd.getbuffer(screen_image_rotated))
+        if(data == None or len(data) == 0):
+          self.draw_loading(currency)
+        else:
+          self.form_image(data, self.screen_draw, currency)
+          screen_image_rotated = self.screen_image.rotate(180)
+          # TODO: add a way to switch bewen partial and full update
+          # epd.presentation(epd.getbuffer(screen_image_rotated))
+          self.epd.displayPartial(self.epd.getbuffer(screen_image_rotated))
 
     @staticmethod
     def close():
