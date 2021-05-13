@@ -12,7 +12,7 @@ from config.currency_config import currencyConfig
 from logs import logger
 from presentation.observer import Observable
 
-import alarm.alarm_manager.alarmManager as alarmManager
+from alarm.alarm_manager import alarmManager as alarmManager
 
 import RPi.GPIO as GPIO
 
@@ -28,6 +28,15 @@ API_URL = 'https://production.api.coindesk.com/v2/price/values/%s?ohlc=true'
 
 currencyList = currencyConfig.currencyList or ['BTC']
 currency_index = 0
+
+def updateCurrencyList():
+  global currencyList
+  global currency_index
+  currentCurrency = currencyList[currency_index]
+  currencyList = currencyConfig.currencyList
+  currency_index = currencyList.index(currentCurrency) if currentCurrency in currencyList else -1
+
+currencyConfig.subscribeToUpdates(updateCurrencyList)
 
 def get_dummy_data():
     logger.info('Generating dummy data') 
@@ -58,7 +67,7 @@ def fetch_prices():
     currency = get_currency()
     return fetch_currency_data(currency)
 
-def alarm_callback():
+def alarm_callback(cur):
     print("alarm")
 
 
@@ -83,6 +92,7 @@ def main():
                 while time_left > 0 and currency == get_currency():
                     time.sleep(1)
                     time_left -= 1
+                print('UPDATE')
                 currency = get_currency()
             except (HTTPError, URLError) as e:
                 logger.error(str(e))

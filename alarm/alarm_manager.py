@@ -1,28 +1,57 @@
-# import RPi.GPIO as GPIO
-import alarm_config
-
-# GPIO.setmode(GPIO.BCM)
+import RPi.GPIO as GPIO
+import time
+import alarm.alarm_config as alarm_config
 
 __all__ = ('alarmManager', 'AlarmManager')
 
-# GPIO.setmode(GPIO.BCM)
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+buzzer=14
 
-# #GPIO.output(buzzer,GPIO.HIGH)
-# #GPIO.output(buzzer,GPIO.LOW)
+GPIO.setup(buzzer,GPIO.OUT)
 
 def checkAlarm(data, alarmValue, isRising):
-    print("Check")
+    alarmValue = int(alarmValue)
+    all_prices = []
+    for price in data:
+      all_prices = all_prices + price
+    if(len(all_prices) > 0):
+      max_value = max(all_prices)
+      min_value = min(all_prices)
+      return ((isRising and max_value > alarmValue) or (not isRising and min_value < alarmValue))
+    else:
+      return FALSE
 
 class AlarmManager:
     def __init__(self):
-        #GPIO.setup(BUZZER,GPIO.OUT)
-        self.alarms = alarm_config.alarms
+        self.alarms = alarm_config.alarmConfig.alarms
+
+    def alarm(self):
+      GPIO.output(buzzer, GPIO.HIGH)
+      time.sleep(1)
+      GPIO.output(buzzer, GPIO.LOW)
+      time.sleep(1)
+      GPIO.output(buzzer, GPIO.HIGH)
+      time.sleep(1)
+      GPIO.output(buzzer, GPIO.LOW)
+      time.sleep(1)
+      GPIO.output(buzzer, GPIO.HIGH)
+      time.sleep(1)
+      GPIO.output(buzzer, GPIO.LOW)
     
     def checkAlarms(self, currency, data, callback):
-      alarm = next(x for x in self.alarms if(x.get('currency').upper() == currency))
-      if(alarm == None) {
-        return;
-      }
-      checkAlarm(data, alarm.get('value'), alarm.get('isRising'))
+      self.alarms = alarm_config.alarmConfig.alarms
+      alarm = next((x for x in self.alarms if(x.get('currency').upper() == currency)), None)
+      
+      if(alarm == None):
+        return False
+      
+      check_result = checkAlarm(data, alarm.get('value'), alarm.get('isRising'))
+      if(check_result):
+        alarm_config.alarmConfig.deleteAlarm(currency)
+        self.alarms = alarm_config.alarmConfig.alarms
+        self.alarm()
+        callback(currency)
+
 
 alarmManager = AlarmManager()
