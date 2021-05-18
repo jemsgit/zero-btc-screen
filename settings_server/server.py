@@ -20,23 +20,23 @@ server_sock = None
 client_sock = None
 client_info = None
 
-#bluetooth command looks like req:set-alarm:BTC:52000:True
+#bluetooth command looks like req::set-alarm::BTC::52000::True
 
 def parseCommand(data):
     if(not data.startswith('req')):
         return 'false'
     else:
-        req_mark, command, *params = data.split(':')
+        req_mark, command, *params = data.split('::')
     if(command in commands):
-        result = commands[command](params)
+        result = commands[command](*params)
         return result
     else:
         return 'false'
 
-def getAlarms():
-    return alarmConfig.alarms
+def getAlarms(*argv):
+    return str(len(alarmConfig.alarms))
 
-def setAlarm(*argv, currency, value, isRising):
+def setAlarm(*argv):
     currency = argv[0]
     value = argv[1]
     isRising = argv[2]
@@ -55,7 +55,7 @@ def deleteAlarm(*argv):
 def setUpdateUrl(*argv):
     url = argv[0]
     if(url):
-        currency_config.updateCurrencyUrl(url)
+        currency_config.currencyConfig.updateCurrencyUrl(url)
         return 'true'
     return 'false'
 
@@ -72,14 +72,14 @@ def startSettingsServer():
     while True:
         client_sock, client_info = server_sock.accept()
         print("Accepted connection from", client_info)
-
         try:
             while True:
                 data = client_sock.recv(1024)
                 if not data:
                     break
                 print("Received", data)
-                client_sock.send('Ok')
+                result = parseCommand(data.decode("utf-8"))
+                client_sock.send(bytes(result, 'utf-8'))
         except OSError:
             pass
 
@@ -90,6 +90,7 @@ def startSettingsServer():
 
 def initSettingsServer():
     global server_sock
+    global port
 
     server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
     server_sock.bind(("", port))
