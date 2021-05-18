@@ -9,7 +9,7 @@ __all__ = ('currencyConfig', 'CurrencyConfig')
 
 def getCurrencyList():
   try:
-    req = Request('https://api.github.com/events')
+    req = Request(currencyConfig.currencyUrl or 'https://api.github.com/events')
     data = urlopen(req).read()
     external_data = json.loads(data)
     currencyConfig.updateCurrencyList(['BTC,ETH'])
@@ -24,6 +24,10 @@ class CurrencyConfig:
     @property
     def currencyList(self):
         return self._conf.get('base', 'currencyList').split(',')
+    
+    @property
+    def currencyUrl(self):
+        return self._conf.get('currency-update-url', 'url')
 
     def reloadConfig(self, file_name=os.path.join(os.path.dirname(__file__), os.pardir, 'currency-config.cfg')):
         self._conf = self._load_currencies(file_name)
@@ -42,6 +46,11 @@ class CurrencyConfig:
     def save_config(self):
         with open(os.path.join(os.path.dirname(__file__), os.pardir, 'currency-config.cfg'), 'w') as configfile:
             self._conf.write(configfile)
+
+    def updateCurrencyUrl(self, url):
+        self._conf.set('currency-update-url', 'url', url)
+        self.save_config()
+        self.reloadConfig()
 
     def updateCurrencyList(self, currencies):
         joiner = ','
