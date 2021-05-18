@@ -13,6 +13,7 @@ from logs import logger
 from presentation.observer import Observable
 
 from alarm.alarm_manager import alarmManager as alarmManager
+from bluetooth.server import initSettingsServer
 
 import RPi.GPIO as GPIO
 
@@ -73,7 +74,7 @@ def alarm_callback(cur):
 
 def main():
     logger.info('Initialize')
-
+    initSettingsServer()
     data_sink = Observable()
     builder = Builder(config)
     builder.bind(data_sink)
@@ -89,13 +90,14 @@ def main():
                 time_left = config.refresh_interval
                 new_currency = currency
                 alarmManager.checkAlarms(currency, prices, alarm_callback)
-                while time_left > 0 and currency == get_currency():
+                while time_left > 0 and currency == new_currency:
                     time.sleep(1)
                     time_left -= 1
+                    new_currency = get_currency()
                 print('UPDATE')
-                if(currency != get_currency()):
-                  data_sink.update_observers(None, get_currency())
-                currency = get_currency()
+                if(currency != new_currency):
+                    data_sink.update_observers(None, new_currency)
+                currency = new_currency
             except (HTTPError, URLError) as e:
                 logger.error(str(e))
                 time.sleep(5)

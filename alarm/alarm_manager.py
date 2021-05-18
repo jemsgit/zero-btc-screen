@@ -20,7 +20,7 @@ def checkAlarm(data, alarmValue, isRising):
       min_value = min(all_prices)
       return ((isRising and max_value > alarmValue) or (not isRising and min_value < alarmValue))
     else:
-      return FALSE
+      return False
 
 class AlarmManager:
     def __init__(self):
@@ -28,15 +28,15 @@ class AlarmManager:
 
     def alarm(self):
       GPIO.output(buzzer, GPIO.HIGH)
-      time.sleep(1)
+      time.sleep(0.3)
       GPIO.output(buzzer, GPIO.LOW)
       time.sleep(1)
       GPIO.output(buzzer, GPIO.HIGH)
-      time.sleep(1)
+      time.sleep(0.3)
       GPIO.output(buzzer, GPIO.LOW)
       time.sleep(1)
       GPIO.output(buzzer, GPIO.HIGH)
-      time.sleep(1)
+      time.sleep(0.3)
       GPIO.output(buzzer, GPIO.LOW)
     
     def checkAlarms(self, currency, data, callback):

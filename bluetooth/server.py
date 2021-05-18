@@ -5,51 +5,22 @@ $Id: rfcomm-server.py 518 2007-08-10 07:20:07Z albert $
 """
 
 import bluetooth
+import threading
 import alarm.alarm_config as alarm_config
-import conig.currency_config as currency_config
+import config.currency_config as currency_config
 
 alarmConfig = alarm_config.alarmConfig
 
+__all__ = ('initSettingsServer')
+
 port = 1
-
-server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-server_sock.bind(("", port))
-server_sock.listen(1)
-
-port = server_sock.getsockname()[1]
-
 uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
 
-bluetooth.advertise_service(server_sock, "SampleServer", service_id=uuid,
-                            service_classes=[uuid, bluetooth.SERIAL_PORT_CLASS],
-                            profiles=[bluetooth.SERIAL_PORT_PROFILE],
-                            # protocols=[bluetooth.OBEX_UUID]
-                            )
+server_sock = None
+client_sock = None
+client_info = None
 
-print("Waiting for connection on RFCOMM channel", port)
-
-client_sock, client_info = server_sock.accept()
-print("Accepted connection from", client_info)
-
-def startSettingsServer():
-  while True:
-      client_sock, client_info = server_sock.accept()
-      print("Accepted connection from", client_info)
-
-      try:
-          while True:
-              data = client_sock.recv(1024)
-              if not data:
-                  break
-              print("Received", data)
-              client_sock.send('Ok')
-      except OSError:
-          pass
-
-    print("Disconnected.")
-
-    client_sock.close()
-    server_sock.close()
+#bluetooth command looks like req:set-alarm:BTC:52000:True
 
 def parseCommand(data):
     if(not data.startswith('req')):
@@ -77,7 +48,7 @@ def setAlarm(*argv, currency, value, isRising):
 def deleteAlarm(*argv):
     currency = argv[0]
     if(currency):
-        alarmConfig.deleteAlarm(alarm['currency'])
+        alarmConfig.deleteAlarm(currency)
         return 'true'
     return 'false'
 
@@ -89,12 +60,50 @@ def setUpdateUrl(*argv):
     return 'false'
 
 commands = {
-	'get-alarms': getAlarms,
-	'set-alarm': setAlarm,
-  'delete-alarm': deleteAlarm,
-  'set-update-url': setUpdateUrl
+    'get-alarms': getAlarms,
+    'set-alarm': setAlarm,
+    'delete-alarm': deleteAlarm,
+    'set-update-url': setUpdateUrl
 }
 
+def startSettingsServer():
+    global client_sock
+    global client_info
+    while True:
+        client_sock, client_info = server_sock.accept()
+        print("Accepted connection from", client_info)
 
-x = threading.Thread(target=startSettingsServer)
-x.start()
+        try:
+            while True:
+                data = client_sock.recv(1024)
+                if not data:
+                    break
+                print("Received", data)
+                client_sock.send('Ok')
+        except OSError:
+            pass
+
+        print("Disconnected.")
+        client_sock.close()
+        server_sock.close()
+
+
+def initSettingsServer():
+    global server_sock
+
+    server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+    server_sock.bind(("", port))
+    server_sock.listen(1)
+
+    port = server_sock.getsockname()[1]
+
+    bluetooth.advertise_service(server_sock, "SampleServer", service_id=uuid,
+                                service_classes=[uuid, bluetooth.SERIAL_PORT_CLASS],
+                                profiles=[bluetooth.SERIAL_PORT_PROFILE],
+                                # protocols=[bluetooth.OBEX_UUID]
+                                )
+
+    print("Waiting for connection on RFCOMM channel", port)
+
+    x = threading.Thread(target=startSettingsServer)
+    x.start()
