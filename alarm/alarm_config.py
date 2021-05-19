@@ -18,13 +18,22 @@ class AlarmConfig:
             alarms_list.append({
               'currency': alarm_cur,
               'value': alarm_settings[0],
-              'isRising': alarm_settings[1] == "True"
+              'isRising': alarm_settings[1] == "True",
+              'isActive': alarm_settings[2] == "True"
             })
         return alarms_list
 
-    def updateAlarm(self, currency, value, isRising = 'False'):
-        self._conf.set('alarms', currency, '%s %s' % (value, isRising))
+    def updateAlarm(self, currency, value, isRising = 'False', isActive = 'True'):
+        self._conf.set('alarms', currency, '%s %s %s' % (value, isRising, isActive))
         self.save_config()
+
+    def inactivateAlarm(self, currency):
+        alarm = next((x for x in self.alarms if(x.get('currency').upper() == currency)), None)
+        if(alarm == None):
+            return
+        self._conf.set('alarms', currency, '%s %s %s' % (alarm.get('value'), alarm.get('isRising'), 'False'))
+        self.save_config()
+
 
     def deleteAlarm(self, currency):
         self._conf.remove_option('alarms', currency)

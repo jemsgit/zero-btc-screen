@@ -40,8 +40,9 @@ def setAlarm(*argv):
     currency = argv[0]
     value = argv[1]
     isRising = argv[2]
+    isActive = argv[3]
     if (currency and value):
-        alarmConfig.updateAlarm(currency, value, isRising)
+        alarmConfig.updateAlarm(currency, value, isRising, isActive)
         return 'true'
     return 'false'
 
@@ -85,7 +86,6 @@ def startSettingsServer():
 
         print("Disconnected.")
         client_sock.close()
-        server_sock.close()
 
 
 def initSettingsServer():

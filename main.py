@@ -51,12 +51,12 @@ def switch_currency(event):
 def get_currency():
     return currencyList[currency_index]
 
-def fetch_currency_data(currency):
+def fetch_currency_data(currency, slicePerios):
     CURRENCY_API_URL = API_URL % currency
     logger.info('Fetching prices')
     timeslot_end = datetime.now(timezone.utc)
     end_date = timeslot_end.strftime(DATETIME_FORMAT)
-    start_data = (timeslot_end - timedelta(hours=HOURS_SLICE_DAYS)).strftime(DATETIME_FORMAT)
+    start_data = (timeslot_end - timedelta(hours=slicePerios)).strftime(DATETIME_FORMAT)
     url = f'{CURRENCY_API_URL}&start_date={start_data}&end_date={end_date}'
     req = Request(url)
     data = urlopen(req).read()
@@ -64,9 +64,9 @@ def fetch_currency_data(currency):
     prices = [entry[1:] for entry in external_data['data']['entries']]
     return prices
 
-def fetch_prices():
+def fetch_prices(period = HOURS_SLICE_DAYS):
     currency = get_currency()
-    return fetch_currency_data(currency)
+    return fetch_currency_data(currency, period)
 
 def alarm_callback(cur):
     print("alarm")
@@ -93,11 +93,11 @@ def main():
                 data_sink.update_observers(prices, currency)
                 time_left = config.refresh_interval
                 new_currency = currency
-                alarmManager.checkAlarms(currency, prices, alarm_callback)
                 while time_left > 0 and currency == new_currency:
                     time.sleep(1)
                     time_left -= 1
                     new_currency = get_currency()
+                    alarmManager.checkAlarms(currency, fetch_prices, alarm_callback)
                 print('UPDATE')
                 if(currency != new_currency):
                     data_sink.update_observers(None, new_currency)
