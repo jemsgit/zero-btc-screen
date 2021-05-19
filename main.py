@@ -13,7 +13,7 @@ from logs import logger
 from presentation.observer import Observable
 
 from alarm.alarm_manager import alarmManager as alarmManager
-from bluetooth.server import initSettingsServer
+from settings_server.server import initSettingsServer
 
 import RPi.GPIO as GPIO
 
@@ -22,7 +22,7 @@ BUTTON_CHANNEL = 4
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(BUTTON_CHANNEL, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-DATA_SLICE_DAYS = 1
+HOURS_SLICE_DAYS = 24
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
 
 API_URL = 'https://production.api.coindesk.com/v2/price/values/%s?ohlc=true'
@@ -56,7 +56,7 @@ def fetch_currency_data(currency):
     logger.info('Fetching prices')
     timeslot_end = datetime.now(timezone.utc)
     end_date = timeslot_end.strftime(DATETIME_FORMAT)
-    start_data = (timeslot_end - timedelta(days=DATA_SLICE_DAYS)).strftime(DATETIME_FORMAT)
+    start_data = (timeslot_end - timedelta(hours=HOURS_SLICE_DAYS)).strftime(DATETIME_FORMAT)
     url = f'{CURRENCY_API_URL}&start_date={start_data}&end_date={end_date}'
     req = Request(url)
     data = urlopen(req).read()
@@ -74,7 +74,11 @@ def alarm_callback(cur):
 
 def main():
     logger.info('Initialize')
-    initSettingsServer()
+    try:
+        initSettingsServer()
+    except:
+        print('bluetooth error')
+
     data_sink = Observable()
     builder = Builder(config)
     builder.bind(data_sink)
