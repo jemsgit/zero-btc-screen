@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 import time
+import threading
 import alarm.alarm_config as alarm_config
 
 __all__ = ('alarmManager', 'AlarmManager')
@@ -21,19 +22,21 @@ def checkAlarm(data, alarmValue, isRising):
 class AlarmManager:
     def __init__(self):
         self.alarms = alarm_config.alarmConfig.alarms
+        self.isAlarm = False
+
+    def stopAlarm(self):
+      self.isAlarm = False
+
+    def alarmRing(self):
+      while self.isAlarm:
+        GPIO.output(buzzer, GPIO.HIGH)
+        time.sleep(0.05)
+        GPIO.output(buzzer, GPIO.LOW)
+        time.sleep(0.2)
 
     def alarm(self):
-      GPIO.output(buzzer, GPIO.HIGH)
-      time.sleep(0.05)
-      GPIO.output(buzzer, GPIO.LOW)
-      time.sleep(0.2)
-      GPIO.output(buzzer, GPIO.HIGH)
-      time.sleep(0.05)
-      GPIO.output(buzzer, GPIO.LOW)
-      time.sleep(0.2)
-      GPIO.output(buzzer, GPIO.HIGH)
-      time.sleep(0.05)
-      GPIO.output(buzzer, GPIO.LOW)
+      x = threading.Thread(target=self.alarmRing)
+      x.start()
     
     def checkAlarms(self, currency, fetcher, callback):
       self.alarms = alarm_config.alarmConfig.alarms
@@ -42,11 +45,12 @@ class AlarmManager:
       if(alarm == None or alarm.get('isActive') == False):
         return False
       
-      data = fetcher(1)
+      data = fetcher()
       check_result = checkAlarm(data, alarm.get('value'), alarm.get('isRising'))
       if(check_result):
         alarm_config.alarmConfig.inactivateAlarm(currency)
         self.alarms = alarm_config.alarmConfig.alarms
+        self.isAlarm = True
         self.alarm()
         callback(currency)
 

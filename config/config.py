@@ -30,7 +30,7 @@ class Config:
 
     @property
     def refresh_interval(self):
-        return self._conf.getint('base', 'refresh_interval_minutes', fallback=15) * 60
+        return self._conf.getint('base', 'refresh_interval', fallback=30)
 
     @staticmethod
     def _load_screens(file_name):

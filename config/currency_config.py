@@ -2,20 +2,36 @@ import configparser
 import os
 import threading
 import json
+import schedule
+import time
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 __all__ = ('currencyConfig', 'CurrencyConfig')
+
+def currencyMapper(item):
+  return item.symbol
 
 def getCurrencyList():
   try:
     req = Request(currencyConfig.currencyUrl or 'https://api.github.com/events')
     data = urlopen(req).read()
     external_data = json.loads(data)
-    currencyConfig.updateCurrencyList(['BTC,ETH'])
+    currency_data = external_data['data']
+    currency_data = map(currency_data, currencyMapper)
+    if(len(currency_data) > 0):
+      currencyConfig.updateCurrencyList(currency_data)
   except (HTTPError, URLError) as e:
     print('Error')
 
+def shedule_list_update():
+  schedule.every().day.at("00:30").do(getCurrencyList)
+  while True:
+    schedule.run_pending()
+    time.sleep(10)
+
+x = threading.Thread(target=shedule_list_update)
+x.start()
 
 class CurrencyConfig:
     def __init__(self, file_name=os.path.join(os.path.dirname(__file__), os.pardir, 'currency-config.cfg')):
