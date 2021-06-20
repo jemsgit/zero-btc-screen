@@ -98,7 +98,7 @@ def fetch_currency_data(currency, interval):
     req = Request(CURRENCY_API_URL)
     data = urlopen(req).read()
     external_data = json.loads(data)
-    prices = map(external_data, data_mapper_to_old)
+    prices = map(data_mapper_to_old, external_data)
     prices = [entry[1:] for entry in prices]
     return {prices: prices, current_price: current_price }
 
