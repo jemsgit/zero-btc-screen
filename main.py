@@ -33,6 +33,9 @@ currencyList = currencyConfig.currencyList or ['BTC']
 currency_index = 0
 currency_interval_index = 3
 
+def data_mapper_to_old(item):
+  return item[0:5]
+
 def updateCurrencyList():
   global currencyList
   global currency_index
@@ -95,7 +98,8 @@ def fetch_currency_data(currency, interval):
     req = Request(CURRENCY_API_URL)
     data = urlopen(req).read()
     external_data = json.loads(data)
-    prices = [entry[1:] for entry in external_data]
+    prices = map(external_data, data_mapper_to_old)
+    prices = [entry[1:] for entry in prices]
     return {prices: prices, current_price: current_price }
 
 def fetch_prices():
