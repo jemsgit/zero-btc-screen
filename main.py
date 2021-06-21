@@ -27,14 +27,15 @@ GPIO.setup(BUTTON_CURRENCY_CHANNEL, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(BUTTON_INTERVAL_CHANNEL, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 API_URL = 'https://api.binance.com/api/v3/ticker/price?symbol=%sUSDT'
-API_URL_CANDLE = 'https://api.binance.com/api/v3/klines?symbol=%sUSDT&interval=1%s&limit=20'
+API_URL_CANDLE = 'https://api.binance.com/api/v3/klines?symbol=%sUSDT&interval=1%s&limit=21'
 
 currencyList = currencyConfig.currencyList or ['BTC']
 currency_index = 0
-currency_interval_index = 3
+currency_interval_index = 2
 
 def data_mapper_to_old(item):
-  return item[0:5]
+  data = item[0:5]
+  return [float(i) for i in data]
 
 def updateCurrencyList():
   global currencyList
@@ -92,15 +93,15 @@ def fetch_currency_data(currency, interval):
     req = Request(CURRENCY_API_URL)
     data = urlopen(req).read()
     external_data = json.loads(data)
-    current_price = external_data['price']
-    CURRENCY_API_URL = API_URL_CANDLE % currency, interval
+    current_price = float(external_data['price'])
+    CURRENCY_API_URL = API_URL_CANDLE % (currency, interval)
     logger.info('Fetching prices2')
     req = Request(CURRENCY_API_URL)
     data = urlopen(req).read()
     external_data = json.loads(data)
     prices = map(data_mapper_to_old, external_data)
     prices = [entry[1:] for entry in prices]
-    return {prices: prices, current_price: current_price }
+    return (prices, current_price)
 
 def fetch_prices():
     currency = get_currency()
@@ -125,15 +126,15 @@ def main():
     interval = get_period()
 
     GPIO.add_event_detect(BUTTON_CURRENCY_CHANNEL, GPIO.RISING, callback=switch_currency, bouncetime=400)
-    GPIO.add_event_detect(BUTTON_CURRENCY_CHANNEL, GPIO.RISING, callback=switch_currency_back, bouncetime=1500)
+    #GPIO.add_event_detect(BUTTON_CURRENCY_CHANNEL, GPIO.RISING, callback=switch_currency_back, bouncetime=1500)
     GPIO.add_event_detect(BUTTON_INTERVAL_CHANNEL, GPIO.RISING, callback=switch_interval, bouncetime=400)
-    GPIO.add_event_detect(BUTTON_INTERVAL_CHANNEL, GPIO.RISING, callback=switch_interval_back, bouncetime=1500)
+    #GPIO.add_event_detect(BUTTON_INTERVAL_CHANNEL, GPIO.RISING, callback=switch_interval_back, bouncetime=1500)
     
     try:
         while True:
             try:
                 prices = [entry[1:] for entry in get_dummy_data()] if config.dummy_data else fetch_prices()
-                data_sink.update_observers(prices.prices, prices.current_price, currency)
+                data_sink.update_observers(prices[0], prices[1], currency)
                 time_left = config.refresh_interval
                 new_currency = currency
                 new_interval = interval
@@ -144,7 +145,7 @@ def main():
                     new_interval = get_period()
                     alarmManager.checkAlarms(currency, fetch_prices, alarm_callback)
                 if(currency != new_currency or interval != new_interval):
-                    data_sink.update_observers(None, new_currency)
+                    data_sink.update_observers(None, None, new_currency)
                 currency = new_currency
                 interval = new_interval
             except (HTTPError, URLError) as e:
