@@ -31,9 +31,6 @@ def shedule_list_update():
     schedule.run_pending()
     time.sleep(10)
 
-x = threading.Thread(target=shedule_list_update)
-x.start()
-
 class CurrencyConfig:
     def __init__(self, file_name=os.path.join(os.path.dirname(__file__), os.pardir, 'currency-config.cfg')):
         self._conf = self._load_currencies(file_name)
@@ -51,7 +48,7 @@ class CurrencyConfig:
 
     def subscribeToUpdates(self, callback):
         self.updateCallback = callback
-        x = threading.Thread(target=getCurrencyList)
+        x = threading.Thread(target=shedule_list_update)
         x.start()
 
     @staticmethod

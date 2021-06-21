@@ -11,11 +11,11 @@ buzzer=14
 
 GPIO.setup(buzzer,GPIO.OUT)
 
-def checkAlarm(data, alarmValue, isRising):
+def checkAlarm(last_value, alarmValue, isRising):
     alarmValue = int(alarmValue)
-    if(data == None or data[-1] == None):
+    if(last_value == None):
         return False
-    last_value = data[-1][0]
+    print('checkAlarm')
     print(last_value)
     return ((isRising and last_value > alarmValue) or (not isRising and alarmValue > last_value))
 
@@ -38,14 +38,13 @@ class AlarmManager:
       x = threading.Thread(target=self.alarmRing)
       x.start()
     
-    def checkAlarms(self, currency, fetcher, callback):
+    def checkAlarms(self, currency, data, callback):
       self.alarms = alarm_config.alarmConfig.alarms
       alarm = next((x for x in self.alarms if(x.get('currency').upper() == currency)), None)
-      
+      print(alarm)
       if(alarm == None or alarm.get('isActive') == False):
         return False
       
-      data = fetcher()
       check_result = checkAlarm(data, alarm.get('value'), alarm.get('isRising'))
       if(check_result):
         alarm_config.alarmConfig.inactivateAlarm(currency)
