@@ -18,7 +18,7 @@ from settings_server.server import initSettingsServer
 import RPi.GPIO as GPIO
 
 BUTTON_CURRENCY_CHANNEL = 4
-BUTTON_INTERVAL_CHANNEL = 5
+BUTTON_INTERVAL_CHANNEL = 17
 
 API_INTERVALS = ['m', 'h', 'd', 'w', 'M']
 
