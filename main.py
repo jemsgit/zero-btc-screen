@@ -18,7 +18,7 @@ from settings_server.server import initSettingsServer
 import RPi.GPIO as GPIO
 
 BUTTON_CURRENCY_CHANNEL = 4
-BUTTON_INTERVAL_CHANNEL = 17
+BUTTON_INTERVAL_CHANNEL = 18
 
 API_INTERVALS = ['m', 'h', 'd', 'w', 'M']
 
@@ -152,7 +152,7 @@ def main():
 
     GPIO.add_event_detect(BUTTON_CURRENCY_CHANNEL, GPIO.RISING, callback=switch_currency, bouncetime=200)
     GPIO.add_event_detect(BUTTON_INTERVAL_CHANNEL, GPIO.RISING, callback=switch_interval, bouncetime=200)
-    
+
     try:
         while True:
             try:
@@ -166,7 +166,6 @@ def main():
                     time_left -= 0.5
                     new_currency = get_currency()
                     new_interval = get_period()
-                    print('check')
                     alarmManager.checkAlarms(currency, prices[1], alarm_callback)
                 if(currency != new_currency or interval != new_interval):
                     data_sink.update_observers(None, None, new_currency)

@@ -41,7 +41,6 @@ class AlarmManager:
     def checkAlarms(self, currency, data, callback):
       self.alarms = alarm_config.alarmConfig.alarms
       alarm = next((x for x in self.alarms if(x.get('currency').upper() == currency)), None)
-      print(alarm)
       if(alarm == None or alarm.get('isActive') == False):
         return False
       

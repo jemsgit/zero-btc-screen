@@ -86,7 +86,7 @@ Button 1
 
 Button 2
 - 3V
-- GPIO 17
+- GPIO 18
 
 Zoomer
 - GND
