@@ -125,9 +125,9 @@ def main():
     interval = get_period()
 
     GPIO.add_event_detect(BUTTON_CURRENCY_CHANNEL, GPIO.RISING, callback=switch_currency, bouncetime=400)
-    GPIO.add_event_detect(BUTTON_CURRENCY_CHANNEL, GPIO.RISING, callback=switch_currency_back, bouncetime=1500)
+    # GPIO.add_event_detect(BUTTON_CURRENCY_CHANNEL, GPIO.RISING, callback=switch_currency_back, bouncetime=1500)
     GPIO.add_event_detect(BUTTON_INTERVAL_CHANNEL, GPIO.RISING, callback=switch_interval, bouncetime=400)
-    GPIO.add_event_detect(BUTTON_INTERVAL_CHANNEL, GPIO.RISING, callback=switch_interval_back, bouncetime=1500)
+    # GPIO.add_event_detect(BUTTON_INTERVAL_CHANNEL, GPIO.RISING, callback=switch_interval_back, bouncetime=1500)
     
     try:
         while True:

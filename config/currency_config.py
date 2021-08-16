@@ -19,6 +19,7 @@ def getCurrencyList():
     external_data = json.loads(data)
     currency_data = external_data['data']
     currency_data = map(currencyMapper, currency_data)
+    print(currency_data)
     if(len(currency_data) > 0):
       currencyConfig.updateCurrencyList(currency_data)
   except (HTTPError, URLError) as e:
