@@ -16,7 +16,7 @@ Bitcoin stock price for your RPi Zero
 2. Install eInk display drivers and dependencies
     ```
     sudo apt update
-    sudo apt-get install python3-pip python3-pil python3-numpy
+    sudo apt-get install python3-pip python3-pil python3-numpy bluetooth bluez python-bluez
     pip3 install RPi.GPIO spidev simplejson schedule pybluez
     git clone https://github.com/waveshare/e-Paper.git ~/e-Paper
     pip3 install ~/e-Paper/RaspberryPi_JetsonNano/python/
