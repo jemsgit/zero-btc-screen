@@ -59,7 +59,7 @@ class Plot:
         data_offset = len(data) % num_of_candles
         candle_data = []
         for i in range(data_offset, len(data), windows_per_candle):
-            window = data[i:i + windows_per_candle - 1]
+            window = data[i:i + windows_per_candle]
             open = window[0][0]
             close = window[len(window) - 1][3]
             high = max([i[1] for i in window])

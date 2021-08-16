@@ -10,7 +10,7 @@ from urllib.request import Request, urlopen
 __all__ = ('currencyConfig', 'CurrencyConfig')
 
 def currencyMapper(item):
-  return item.symbol
+  return item.get('symbol')
 
 def getCurrencyList():
   try:
@@ -18,7 +18,7 @@ def getCurrencyList():
     data = urlopen(req).read()
     external_data = json.loads(data)
     currency_data = external_data['data']
-    currency_data = map(currencyMapper, currency_data)
+    currency_data = list(map(currencyMapper, currency_data))
     print(currency_data)
     if(len(currency_data) > 0):
       currencyConfig.updateCurrencyList(currency_data)
@@ -30,9 +30,6 @@ def shedule_list_update():
   while True:
     schedule.run_pending()
     time.sleep(10)
-
-x = threading.Thread(target=shedule_list_update)
-x.start()
 
 class CurrencyConfig:
     def __init__(self, file_name=os.path.join(os.path.dirname(__file__), os.pardir, 'currency-config.cfg')):
@@ -51,7 +48,7 @@ class CurrencyConfig:
 
     def subscribeToUpdates(self, callback):
         self.updateCallback = callback
-        x = threading.Thread(target=getCurrencyList)
+        x = threading.Thread(target=shedule_list_update)
         x.start()
 
     @staticmethod

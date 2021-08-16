@@ -76,3 +76,18 @@ The following screens are supported:
 * epd2in13v2
 * epd2in13bv3
 * picture
+
+
+Raspberry Pi GPIO
+
+Button 1
+- 3V
+- GPIO 4
+
+Button 2
+- 3V
+- GPIO 18
+
+Zoomer
+- GND
+- GPIO 14

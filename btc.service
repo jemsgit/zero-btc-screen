@@ -1,0 +1,11 @@
+#!/bin/sh
+
+[Unit]
+Description=Start btc app
+After=bluetooth.target
+BindsTo=bluetooth.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash hciconfig hci0 piscan
+ExecStart=/usr/bin/python3 main.py
