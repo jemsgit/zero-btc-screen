@@ -60,11 +60,16 @@ def setUpdateUrl(*argv):
         return 'true'
     return 'false'
 
+def getUpdateUrl(*argv):
+    return currency_config.currencyConfig.currencyUrl
+
+
 commands = {
     'get-alarms': getAlarms,
     'set-alarm': setAlarm,
     'delete-alarm': deleteAlarm,
-    'set-update-url': setUpdateUrl
+    'set-update-url': setUpdateUrl,
+    'get-update-url': getUpdateUrl
 }
 
 def startSettingsServer():
