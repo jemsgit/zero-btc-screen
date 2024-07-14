@@ -2,6 +2,8 @@ import json
 import random
 import time
 import threading
+import multiprocessing
+import atexit
 from datetime import datetime, timezone, timedelta
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -14,6 +16,7 @@ from presentation.observer import Observable
 
 from alarm.alarm_manager import alarmManager as alarmManager
 from settings_server.server import initSettingsServer
+from settings_server.server_web import app
 
 import RPi.GPIO as GPIO
 
@@ -32,6 +35,23 @@ API_URL_CANDLE = 'https://api.binance.com/api/v3/klines?symbol=%sUSDT&interval=1
 currencyList = currencyConfig.currencyList or ['BTC']
 currency_index = 0
 currency_interval_index = 1
+server_process = None
+
+def start_web_server():
+    global server_process
+    server_process = multiprocessing.Process(target=app.run, kwargs={'host': '0.0.0.0', 'port': 5000})
+    server_process.start()
+
+def stop_web_server(process):
+    global server_process
+    if server_process and server_process.is_alive():
+        server_process.terminate()
+        server_process.join()
+        print("Flask server stopped.")
+    else:
+        print("Flask server is not running.")
+
+atexit.register(stop_web_server)
 
 def data_mapper_to_old(item):
   data = item[0:5]
@@ -146,6 +166,11 @@ def main():
     except:
         print('bluetooth error')
 
+    try:
+        start_web_server()
+    except:
+        print('web server error')
+
     data_sink = Observable()
     builder = Builder(config)
     builder.bind(data_sink)
@@ -181,6 +206,7 @@ def main():
     except KeyboardInterrupt:
         logger.info('Exit')
         data_sink.close()
+        stop_web_server()
         exit()
 
 

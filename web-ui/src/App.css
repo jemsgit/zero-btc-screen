@@ -1,0 +1,194 @@
+.App {
+  padding: 20px;
+}
+
+.title {
+  text-align: center;
+}
+
+.content {
+  padding: 0 32px;
+  position: relative;
+}
+
+.alarms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-inline-start: 0;
+  max-width: 600px;
+}
+
+.list-item {
+  list-style: none;
+  padding: 12px;
+  cursor: pointer;
+  box-shadow: #0000003b 2px 2px 6px 0px;
+
+  &:hover {
+    box-shadow: #0000003b 4px 5px 6px 0px;
+  }
+}
+
+.list-item.not-active:nth-child(odd),
+.list-item.not-active:nth-child(even) {
+  background-color: #e2e2e2;
+}
+
+.list-item:nth-child(odd) {
+  background-color: #fff4cc;
+}
+
+.list-item:nth-child(even) {
+  background-color: #cce1ff;
+}
+
+.list-item-value {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  div {
+    font-size: 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.item-form {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  .item-form,
+  .new-form {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .content {
+    padding: 0 8px;
+  }
+}
+
+.buttons-area {
+  display: flex;
+  gap: 12px;
+}
+
+.item-form-controls {
+  flex: 1 1 auto;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.button {
+  cursor: pointer;
+  background-color: #fafafa;
+  border-radius: 3px;
+  padding: 4px 8px;
+  border: 1px #0000005c solid;
+  font-size: 16px;
+}
+
+.add-action {
+  border-bottom: 1px black dashed;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.new-form {
+  display: flex;
+  max-width: 600px;
+  margin-bottom: 30px;
+}
+
+.config-url {
+  margin: 20px 0;
+  padding: 12px 0;
+
+  border-bottom: 1px #c9c9c9 solid;
+
+  input {
+    margin-right: 12px;
+  }
+}
+
+.config-label {
+  text-decoration: underline;
+  padding-bottom: 8px;
+}
+
+.config-url-view {
+  span {
+    display: inline-block;
+    margin-right: 12px;
+  }
+}
+
+.loader {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0px 4px 20px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+}
+
+input,
+select {
+  font-size: 16px;
+  padding: 2px;
+}
+
+label {
+  cursor: pointer;
+}
+
+input[type="number"] {
+  max-width: 80px;
+}
+
+.flip-content {
+  -webkit-animation: flip-horizontal-bottom 1s
+    cubic-bezier(0.455, 0.03, 0.515, 0.955) both;
+  animation: flip-horizontal-bottom 1s cubic-bezier(0.455, 0.03, 0.515, 0.955)
+    both;
+  animation-iteration-count: infinite;
+}
+
+@-webkit-keyframes flip-horizontal-bottom {
+  0% {
+    -webkit-transform: rotateY(0);
+    transform: rotateY(0);
+  }
+  100% {
+    -webkit-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+  }
+}
+@keyframes flip-horizontal-bottom {
+  0% {
+    -webkit-transform: rotateY(0);
+    transform: rotateY(0);
+  }
+  100% {
+    -webkit-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+  }
+}
