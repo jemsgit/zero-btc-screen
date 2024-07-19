@@ -5,6 +5,8 @@ import os
 import alarm.alarm_config as alarm_config
 import config.currency_config as currency_config
 
+alarmConfig = alarm_config.alarmConfig
+
 app = Flask(__name__, static_folder='../web-ui/build', static_url_path='')
 CORS(app)
 auth = HTTPBasicAuth()
@@ -27,13 +29,6 @@ def get_alarms():
     alarms = alarmConfig.alarms
     return jsonify(alarms)
 
-@app.route('/api/currency-list', methods=['GET'])
-@auth.login_required
-def get_currencylist():
-    list = [
-      'BTC', "ETH"
-    ]
-    return jsonify(list)
 
 @app.route('/api/alarms', methods=['POST'])
 @auth.login_required
@@ -55,13 +50,13 @@ def delete_alarm(currency):
     alarmConfig.deleteAlarm(currency)
     return '', 204
 
-@app.route('/api/currecy-list', methods=['GET'])
+@app.route('/api/currency-list', methods=['GET'])
 @auth.login_required
 def update_currency_list_url(currency):
     listData = currency_config.currencyConfig.currencyList
     return jsonify({"list": listData})
 
-@app.route('/api/currecy-list-url', methods=['GET'])
+@app.route('/api/currency-list-url', methods=['GET'])
 @auth.login_required
 def get_config_url():
     url = currency_config.currencyConfig.currencyUrl
@@ -72,7 +67,7 @@ def get_config_url():
 def update_config_url():
     data = request.json
     new_url = data.get('url')
-    # currency_config.currencyConfig.updateCurrencyUrl(new_url)
+    currency_config.currencyConfig.updateCurrencyUrl(new_url)
     # Update the config URL
     return jsonify({"url": new_url})
 
