@@ -4,9 +4,14 @@ import time
 import threading
 import multiprocessing
 import atexit
+import socket
 from datetime import datetime, timezone, timedelta
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+
+import qrcode
+from PIL import Image
+import RPi.GPIO as GPIO
 
 from config.builder import Builder
 from config.config import config
@@ -18,7 +23,7 @@ from alarm.alarm_manager import alarmManager as alarmManager
 from settings_server.server import initSettingsServer
 from settings_server.server_web import app
 
-import RPi.GPIO as GPIO
+web_server_port = 5001
 
 BUTTON_CURRENCY_CHANNEL = 4
 BUTTON_INTERVAL_CHANNEL = 18
@@ -36,6 +41,33 @@ currencyList = currencyConfig.currencyList or ['BTC']
 currency_index = 0
 currency_interval_index = 1
 server_process = None
+
+def get_ip_address():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('10.254.254.254', 1))
+        ip = s.getsockname()[0]
+    except Exception:
+        ip = '127.0.0.1'
+    finally:
+        s.close()
+    return ip
+
+def create_IP_QRCODE():
+    ip_address = get_ip_address()
+    url = f'http://{ip_address}:{web_server_port}'
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=50,
+        border=4,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    desired_size = (100, 100)
+    img = img.resize(desired_size, Image.ANTIALIAS)
+    img.save("qr_code.png")
 
 def start_web_server():
     global server_process
@@ -78,9 +110,8 @@ def applyButtonCallback(channel, shortCb, longCb, event):
         print("long button")         
         longCb(event)
         return
-    if buttonTime >= .1:
-        print("short button")         
-        shortCb(event)
+    print("short button")         
+    shortCb(event)
 
 def switch_currency(event):
   if(stopAlarm()):
@@ -179,6 +210,9 @@ def main():
 
     GPIO.add_event_detect(BUTTON_CURRENCY_CHANNEL, GPIO.RISING, callback=switch_currency, bouncetime=400)
     GPIO.add_event_detect(BUTTON_INTERVAL_CHANNEL, GPIO.RISING, callback=switch_interval, bouncetime=400)
+
+    create_IP_QRCODE()
+    data_sink.showQR()
 
     try:
         while True:

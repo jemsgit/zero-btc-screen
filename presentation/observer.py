@@ -20,3 +20,7 @@ class Observable:
     def close(self):
         for observer in self._observers:
             observer.close()
+
+    def showQR(self):
+        for observer in self._observers:
+            observer.showImage()

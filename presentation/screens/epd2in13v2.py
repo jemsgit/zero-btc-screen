@@ -2,12 +2,16 @@ import os
 
 from PIL import Image, ImageDraw, ImageFont
 from waveshare_epd import epd2in13_V2
+import time
 
 from data.plot import Plot
 from presentation.observer import Observer
 
 SCREEN_HEIGHT = epd2in13_V2.EPD_WIDTH  # 122
 SCREEN_WIDTH = epd2in13_V2.EPD_HEIGHT  # 250
+
+current_dir = os.path.dirname(__file__)
+two_dirs_up = os.path.abspath(os.path.join(current_dir, '..', '..'))
 
 FONT_SMALL = ImageFont.truetype(
     os.path.join(os.path.dirname(__file__), os.pardir, 'Roses.ttf'), 8)
@@ -63,6 +67,14 @@ class Epd2in13v2(Observer):
           # TODO: add a way to switch bewen partial and full update
           # epd.presentation(epd.getbuffer(screen_image_rotated))
           self.epd.displayPartial(self.epd.getbuffer(screen_image_rotated))
+
+    def showImage(self):
+        img = Image.new('1', (SCREEN_WIDTH, SCREEN_HEIGHT), 255)
+        image_path = os.path.join(two_dirs_up, 'qr_code.png')
+        imagepng = Image.open(image_path)
+        img.paste(imagepng, (70,2)) 
+        self.epd.displayPartial(self.epd.getbuffer(img))
+        time.sleep(10)
 
     @staticmethod
     def close():

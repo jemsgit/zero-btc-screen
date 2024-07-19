@@ -52,5 +52,8 @@ class Epd2in13bv3(Observer):
             self.epd.getbuffer(image_ry_rotated)
         )
 
+    def showImage(self):
+        print('not implemented')
+
     def close(self):
         self.epd.Dev_exit()

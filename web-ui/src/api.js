@@ -6,7 +6,7 @@ const authToken = btoa(`${username}:${password}`);
 
 export const fetchAlarms = async () => {
   try {
-    const response = await fetch(`${baseUrl}/api/alarms`, {
+    const response = await fetch(`/api/alarms`, {
       headers: {
         Authorization: `Basic ${authToken}`,
       },
@@ -24,7 +24,7 @@ export const fetchAlarms = async () => {
 };
 
 export const fetchCurrencyList = async () => {
-  const response = await fetch(`${baseUrl}/api/currency-list`, {
+  const response = await fetch(`/api/currency-list`, {
     headers: {
       Authorization: `Basic ${authToken}`,
     },
@@ -39,7 +39,7 @@ export const fetchCurrencyList = async () => {
 };
 
 export const addAlarm = async (newAlarm) => {
-  const response = await fetch(`${baseUrl}/api/alarms`, {
+  const response = await fetch(`/api/alarms`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -56,7 +56,7 @@ export const addAlarm = async (newAlarm) => {
 };
 
 export const updateAlarm = async (currency, updatedAlarm) => {
-  const response = await fetch(`${baseUrl}/api/alarms/${currency}`, {
+  const response = await fetch(`/api/alarms/${currency}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -72,7 +72,7 @@ export const updateAlarm = async (currency, updatedAlarm) => {
 };
 
 export const deleteAlarm = async (currency) => {
-  const response = await fetch(`${baseUrl}/api/alarms/${currency}`, {
+  const response = await fetch(`/api/alarms/${currency}`, {
     method: "DELETE",
     headers: {
       Authorization: `Basic ${authToken}`,
@@ -86,7 +86,7 @@ export const deleteAlarm = async (currency) => {
 };
 
 export async function fetchConfigUrl() {
-  const response = await fetch(`${baseUrl}/api/currecy-list-url`, {
+  const response = await fetch(`/api/currecy-list-url`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Basic ${authToken}`,
@@ -97,7 +97,7 @@ export async function fetchConfigUrl() {
 }
 
 export async function updateConfigUrl(newUrl) {
-  const response = await fetch(`${baseUrl}/api/currecy-list-url`, {
+  const response = await fetch(`/api/currecy-list-url`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
