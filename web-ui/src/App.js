@@ -69,9 +69,9 @@ function App() {
       .finally(() => setIsLoading(false));
   };
 
-  const existedAlarms = alarms.map(({ currency }) => currency);
+  const existedAlarms = alarms.map(({ currency }) => currency.toUpperCase());
   const availableCurrencies = currencyList.filter(
-    (item) => !existedAlarms.includes(item)
+    (item) => !existedAlarms.includes(item.toUpperCase())
   );
   return (
     <div className="App">

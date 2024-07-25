@@ -14,19 +14,29 @@ function ConfigUrl({ url, onSave }) {
     setIsEditing(false);
   };
 
+  const handleCancelSave = () => {
+    setNewUrl(url);
+    setIsEditing(false);
+  };
+
   return (
     <div className="config-url">
       <div className="config-label">URL получения валют</div>
       {isEditing ? (
-        <div>
+        <div className="config-form">
           <input
             type="text"
             value={newUrl}
             onChange={(e) => setNewUrl(e.target.value.trim())}
           />
-          <button className="button" onClick={handleSaveClick}>
-            Сохранить
-          </button>
+          <div className="config-buttons">
+            <button className="button" onClick={handleSaveClick}>
+              Сохранить
+            </button>
+            <button className="button" onClick={handleCancelSave}>
+              Отмена
+            </button>
+          </div>
         </div>
       ) : (
         <div className="config-url-view">

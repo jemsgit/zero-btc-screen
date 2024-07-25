@@ -120,6 +120,15 @@
   }
 }
 
+.config-form {
+  display: flex;
+
+  input {
+    display: flex;
+    flex: 1 1 auto;
+  }
+}
+
 .config-label {
   text-decoration: underline;
   padding-bottom: 8px;
