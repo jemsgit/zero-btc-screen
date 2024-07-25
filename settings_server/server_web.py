@@ -52,9 +52,10 @@ def delete_alarm(currency):
 
 @app.route('/api/currency-list', methods=['GET'])
 @auth.login_required
-def update_currency_list_url(currency):
+def get_currencylist():
     listData = currency_config.currencyConfig.currencyList
     return jsonify({"list": listData})
+
 
 @app.route('/api/currency-list-url', methods=['GET'])
 @auth.login_required
