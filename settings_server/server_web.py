@@ -62,7 +62,7 @@ def get_config_url():
     url = currency_config.currencyConfig.currencyUrl
     return jsonify({"url": url})
 
-@app.route('/api/currecy-list-url', methods=['PUT'])
+@app.route('/api/currency-list-url', methods=['PUT'])
 @auth.login_required
 def update_config_url():
     data = request.json
