@@ -22,6 +22,11 @@ def checkAlarm(last_value, alarmValue, isRising):
 class AlarmManager:
     def __init__(self):
         self.alarms = alarm_config.alarmConfig.alarms
+        alarm_config.alarmConfig.subsribe(self.reinit)
+        self.isAlarm = False
+
+    def reinit(self):
+        self.alarms = alarm_config.alarmConfig.alarms
         self.isAlarm = False
 
     def stopAlarm(self):

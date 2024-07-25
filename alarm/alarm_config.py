@@ -3,6 +3,7 @@ import os
 
 __all__ = ('alarmConfig', 'AlarmConfig')
 
+subs = None
 
 class AlarmConfig:
     def __init__(self, file_name=os.path.join(os.path.dirname(__file__), os.pardir, 'alarms.cfg')):
@@ -23,9 +24,16 @@ class AlarmConfig:
             })
         return alarms_list
 
+    def subsribe(cb):
+        global subs
+        subs = cb
+
     def updateAlarm(self, currency, value, isRising = 'False', isActive = 'True'):
         self._conf.set('alarms', currency, '%s %s %s' % (value, isRising, isActive))
         self.save_config()
+        if(subs is not None):
+            self.reloadConfig()
+            subs()
 
     def inactivateAlarm(self, currency):
         alarm = next((x for x in self.alarms if(x.get('currency').upper() == currency)), None)
@@ -33,11 +41,17 @@ class AlarmConfig:
             return
         self._conf.set('alarms', currency, '%s %s %s' % (alarm.get('value'), alarm.get('isRising'), 'False'))
         self.save_config()
+        if(subs is not None):
+            self.reloadConfig()
+            subs()
 
 
     def deleteAlarm(self, currency):
         self._conf.remove_option('alarms', currency)
         self.save_config()
+        if(subs is not None):
+            self.reloadConfig()
+            subs()
 
     def reloadConfig(self, file_name=os.path.join(os.path.dirname(__file__), os.pardir, 'alarms.cfg')):
         self._conf = self._load_alarms(file_name)
