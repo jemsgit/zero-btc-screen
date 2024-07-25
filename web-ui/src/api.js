@@ -86,7 +86,7 @@ export const deleteAlarm = async (currency) => {
 };
 
 export async function fetchConfigUrl() {
-  const response = await fetch(`/api/currecy-list-url`, {
+  const response = await fetch(`/api/currency-list-url`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Basic ${authToken}`,
@@ -97,7 +97,7 @@ export async function fetchConfigUrl() {
 }
 
 export async function updateConfigUrl(newUrl) {
-  const response = await fetch(`/api/currecy-list-url`, {
+  const response = await fetch(`/api/currency-list-url`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
