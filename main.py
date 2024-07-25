@@ -25,8 +25,8 @@ from settings_server.server_web import app
 
 web_server_port = 5001
 
-BUTTON_CURRENCY_CHANNEL = 4
-BUTTON_INTERVAL_CHANNEL = 18
+BUTTON_CURRENCY_CHANNEL = 4 #GPIO 4
+BUTTON_INTERVAL_CHANNEL = 16 #GPIO 16
 
 API_INTERVALS = ['m', 'h', 'd', 'w', 'M']
 
@@ -71,7 +71,7 @@ def create_IP_QRCODE():
 
 def start_web_server():
     global server_process
-    server_process = multiprocessing.Process(target=app.run, kwargs={'host': '0.0.0.0', 'port': 5000})
+    server_process = multiprocessing.Process(target=app.run, kwargs={'host': '0.0.0.0', 'port': web_server_port})
     server_process.start()
 
 def stop_web_server(process):
