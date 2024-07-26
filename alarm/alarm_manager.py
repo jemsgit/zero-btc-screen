@@ -22,10 +22,12 @@ def checkAlarm(last_value, alarmValue, isRising):
 class AlarmManager:
     def __init__(self):
         self.alarms = alarm_config.alarmConfig.alarms
-        alarm_config.alarmConfig.subsribe(self.reinit)
+        # doesnt work
+        # alarm_config.alarmConfig.subsribe(self.reinit)
         self.isAlarm = False
 
     def reinit(self):
+        alarm_config.alarmConfig.reloadConfig()
         self.alarms = alarm_config.alarmConfig.alarms
         self.isAlarm = False
 
@@ -44,6 +46,7 @@ class AlarmManager:
       x.start()
     
     def checkAlarms(self, currency, data, callback):
+      alarm_config.alarmConfig.reloadConfig()
       self.alarms = alarm_config.alarmConfig.alarms
       alarm = next((x for x in self.alarms if(x.get('currency').upper() == currency)), None)
       if(alarm == None or alarm.get('isActive') == False):
